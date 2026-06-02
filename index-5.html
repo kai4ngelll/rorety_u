@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>roretyu — portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Unbounded:wght@200;400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #080808;
+      --surface: #0f0f0f;
+      --border: #1c1c1c;
+      --text: #e8e8e8;
+      --muted: #555;
+      --accent: #c8ff00;
+      --accent2: #ff4d6d;
+      --accent3: #00e5ff;
+      --card: #111;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* GRID LINES */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 60px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(20px);
+    }
+    .nav-logo {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+    }
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 60px;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .hero-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-name {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: clamp(72px, 12vw, 160px);
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+      color: var(--text);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .hero-name span {
+      color: transparent;
+      -webkit-text-stroke: 1px var(--muted);
+    }
+
+    .hero-role {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 200;
+      font-size: clamp(14px, 2vw, 22px);
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 48px;
+    }
+    .hero-role em {
+      color: var(--accent3);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 14px 28px;
+      border: 1px solid;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #080808;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .btn-primary:hover {
+      background: transparent;
+      color: var(--accent);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* BIG BG TEXT */
+    .hero-bg-text {
+      position: absolute;
+      bottom: -40px;
+      right: -20px;
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: clamp(120px, 20vw, 280px);
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+      letter-spacing: -0.06em;
+      pointer-events: none;
+      user-select: none;
+      line-height: 1;
+    }
+
+    /* SCROLL INDICATOR */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .scroll-line {
+      width: 48px; height: 1px;
+      background: var(--muted);
+      position: relative;
+      overflow: hidden;
+    }
+    .scroll-line::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: var(--accent);
+      animation: scanline 2s infinite;
+    }
+    @keyframes scanline { to { left: 100%; } }
+
+    /* SECTIONS SHARED */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 120px 60px;
+    }
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .section-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: clamp(36px, 5vw, 72px);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    /* ABOUT */
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 32px 28px;
+      transition: border-color 0.25s;
+    }
+    .stat-card:hover { border-color: var(--accent); }
+    .stat-num {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 48px;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* SKILLS */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .skill-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 40px 32px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .skill-card:hover::before { transform: scaleX(1); }
+    .skill-card:hover { border-color: var(--accent); background: #151515; }
+    .skill-icon {
+      font-size: 32px;
+      margin-bottom: 24px;
+    }
+    .skill-name {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .skill-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 20px;
+    }
+    .tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .tag:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* CONNECT */
+    .connect-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .connect-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 40px 32px;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .connect-card::after {
+      content: '→';
+      position: absolute;
+      top: 32px; right: 32px;
+      font-size: 18px;
+      color: var(--muted);
+      transition: all 0.25s ease;
+    }
+    .connect-card:hover::after {
+      right: 24px;
+      color: var(--accent);
+    }
+    .connect-card:hover {
+      border-color: var(--accent);
+      background: #151515;
+    }
+    .connect-platform {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .connect-handle {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+    .connect-desc {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* MUSIC PLAYER */
+    .player-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      max-width: 640px;
+      margin-top: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .player-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(200,255,0,0.03), transparent);
+      pointer-events: none;
+    }
+    .play-btn {
+      width: 64px; height: 64px;
+      background: var(--accent);
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .play-btn:hover { background: #d4ff1a; transform: scale(1.05); }
+    .play-btn svg { width: 24px; height: 24px; }
+    .player-info { flex: 1; }
+    .player-track {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .player-artist {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 2px;
+      background: var(--border);
+      position: relative;
+      cursor: pointer;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    .player-time {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 32px;
+    }
+    .wave-bar {
+      width: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      opacity: 0.3;
+      transition: opacity 0.2s;
+    }
+    .wave-bar.active {
+      animation: wave 0.8s ease-in-out infinite alternate;
+      opacity: 1;
+    }
+    @keyframes wave {
+      from { transform: scaleY(0.4); }
+      to { transform: scaleY(1); }
+    }
+
+    /* VIBES / HOBBIES */
+    .vibes-section { background: #0a0a0a; }
+    .vibes-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 40px;
+    }
+    .vibe-chip {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .vibe-chip:hover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+    .vibe-chip.highlight {
+      border-color: var(--accent3);
+      color: var(--accent3);
+    }
+    .hobbies-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-logo {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      color: var(--accent);
+    }
+    .footer-copy {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+    }
+
+    /* SECTION TABS NAV */
+    .tabs-nav {
+      position: sticky;
+      top: 73px;
+      z-index: 50;
+      background: rgba(8,8,8,0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      overflow-x: auto;
+    }
+    .tabs-nav a {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 18px 32px;
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    .tabs-nav a:hover,
+    .tabs-nav a.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 900px) {
+      nav, section, footer { padding-left: 24px; padding-right: 24px; }
+      .hero { padding: 0 24px; }
+      .about-stats { grid-template-columns: 1fr 1fr !important; }
+      .skills-grid, .connect-grid { grid-template-columns: 1fr; }
+      .scroll-hint { left: 24px; }
+      .hero-bg-text { font-size: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+
+  <div class="grid-bg"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">ror.</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#connect">Connect</a></li>
+      <li><a href="#vibes">Vibes</a></li>
+    </ul>
+  </nav>
+
+  <!-- TABS NAV -->
+  <div class="tabs-nav" style="margin-top:73px;">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#connect">Connect</a>
+    <a href="#music">Music</a>
+    <a href="#vibes">Vibes</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="home" style="padding-top:0; margin-top:-73px;">
+    <div class="hero-tag">Available for projects</div>
+    <h1 class="hero-name">
+      ror<span>etyu</span>
+    </h1>
+    <p class="hero-role">
+      Coder · Scripter · <em>Developer</em>
+    </p>
+    <div class="hero-cta">
+      <a href="https://t.me/roretyu" target="_blank" class="btn btn-primary">Contact me ↗</a>
+      <a href="#skills" class="btn btn-ghost">View skills</a>
+    </div>
+    <div class="hero-bg-text">DEV</div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      scroll
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-label">001 — About</div>
+    <h2 class="section-title reveal">Builder.<br>Developer.<br>Creator.</h2>
+    <div class="about-stats reveal" style="margin-top:48px; grid-template-columns: repeat(4,1fr);">
+      <div class="stat-card">
+        <div class="stat-num">3yr</div>
+        <div class="stat-label">Scripting experience</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">Lua</div>
+        <div class="stat-label">Primary language</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Projects built</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="font-size:22px; line-height:1.3;">9:00–2:00</div>
+        <div class="stat-label">Online · GMT+3</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" style="background:#090909;">
+    <div class="section-label">002 — Skills</div>
+    <h2 class="section-title reveal">What I do</h2>
+    <div class="skills-grid reveal" style="margin-top:48px;">
+      <div class="skill-card">
+        <div class="skill-icon">⌨️</div>
+        <div class="skill-name">Scripting</div>
+        <div class="skill-desc">3 years of writing clean, efficient scripts. Automation, tools, game logic — built to last.</div>
+        <div class="skill-tags">
+          <span class="tag">Lua</span>
+          <span class="tag">Python</span>
+          <span class="tag">Bash</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🛠️</div>
+        <div class="skill-name">Development</div>
+        <div class="skill-desc">Full cycle dev — from concept to working product. Bots, tools, games, web utilities.</div>
+        <div class="skill-tags">
+          <span class="tag">Roblox</span>
+          <span class="tag">Bots</span>
+          <span class="tag">Web</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">💻</div>
+        <div class="skill-name">Coding</div>
+        <div class="skill-desc">Systems that work under the hood. Clean architecture, sharp logic, zero bloat.</div>
+        <div class="skill-tags">
+          <span class="tag">APIs</span>
+          <span class="tag">Tools</span>
+          <span class="tag">Backend</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONNECT -->
+  <section id="connect">
+    <div class="section-label">003 — Connect</div>
+    <h2 class="section-title reveal">Find me</h2>
+    <div class="connect-grid reveal" style="margin-top:48px;">
+      <a href="https://t.me/roretyu" target="_blank" class="connect-card">
+        <div class="connect-platform">Telegram · Personal</div>
+        <div class="connect-handle">@roretyu</div>
+        <div class="connect-desc">DM for projects, collabs, anything.</div>
+      </a>
+      <a href="https://t.me/nettspendii" target="_blank" class="connect-card">
+        <div class="connect-platform">Telegram · Channel</div>
+        <div class="connect-handle">@nettspendii</div>
+        <div class="connect-desc">Updates, content, and vibes.</div>
+      </a>
+      <a href="https://pin.it/5yI5ThJ4b" target="_blank" class="connect-card">
+        <div class="connect-platform">Pinterest</div>
+        <div class="connect-handle">Pinterest ↗</div>
+        <div class="connect-desc">Mood boards and visual inspiration.</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MUSIC -->
+  <section id="music" style="background:#090909;">
+    <div class="section-label">004 — Music</div>
+    <h2 class="section-title reveal">Now playing</h2>
+    <div class="player-wrap reveal" style="margin-top:48px;">
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">
+        <svg id="playIcon" viewBox="0 0 24 24" fill="#080808">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+      <div class="player-info">
+        <div class="player-track">Beach Leak</div>
+        <div class="player-artist">Nettspend</div>
+        <div class="progress-bar" id="progressBar" onclick="seek(event)">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="player-time">
+          <span id="currentTime">0:00</span>
+          <span id="duration">0:00</span>
+        </div>
+      </div>
+      <div class="waveform" id="waveform"></div>
+    </div>
+    <audio id="audio" src="Nettspend_-_Beach_Leak.mp3"></audio>
+  </section>
+
+  <!-- VIBES -->
+  <section class="vibes-section" id="vibes">
+    <div class="section-label">005 — Vibes</div>
+    <h2 class="section-title reveal">Outside the code</h2>
+    <div style="margin-top:40px;" class="reveal">
+      <p class="hobbies-title">🎸 I play guitar</p>
+      <p style="color:var(--muted); font-size:14px; margin-top:8px; margin-bottom:32px; font-family: 'Space Mono', monospace; letter-spacing:0.05em;">
+        Artists I listen to:
+      </p>
+      <div class="vibes-row">
+        <div class="vibe-chip highlight">kai angel</div>
+        <div class="vibe-chip highlight">nettspend</div>
+        <div class="vibe-chip">osamason</div>
+        <div class="vibe-chip">che phreshboyswag</div>
+        <div class="vibe-chip">prettifun</div>
+        <div class="vibe-chip">xaviersobased</div>
+        <div class="vibe-chip highlight">2hollis</div>
+        <div class="vibe-chip">elyaplugg!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">roretyu</div>
+    <div class="footer-copy">© 2026 · Built different</div>
+  </footer>
+
+  <script>
+    // WAVEFORM
+    const waveform = document.getElementById('waveform');
+    const heights = [12,20,28,16,32,24,18,30,14,22,28,16,24];
+    heights.forEach((h, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'wave-bar';
+      bar.style.height = h + 'px';
+      bar.style.animationDelay = (i * 0.08) + 's';
+      waveform.appendChild(bar);
+    });
+
+    // AUDIO PLAYER
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('playBtn');
+    const playIcon = document.getElementById('playIcon');
+    const progressFill = document.getElementById('progressFill');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationEl = document.getElementById('duration');
+    let playing = false;
+
+    function fmt(s) {
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    audio.addEventListener('loadedmetadata', () => {
+      durationEl.textContent = fmt(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const pct = (audio.currentTime / audio.duration) * 100;
+      progressFill.style.width = pct + '%';
+      currentTimeEl.textContent = fmt(audio.currentTime);
+    });
+
+    function togglePlay() {
+      if (playing) {
+        audio.pause();
+        playing = false;
+        playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        document.querySelectorAll('.wave-bar').forEach(b => b.classList.remove('active'));
+      } else {
+        audio.play();
+        playing = true;
+        playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+        document.querySelectorAll('.wave-bar').forEach(b => b.classList.add('active'));
+      }
+    }
+
+    function seek(e) {
+      const bar = document.getElementById('progressBar');
+      const rect = bar.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pct * audio.duration;
+    }
+
+    // REVEAL ON SCROLL
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(r => observer.observe(r));
+
+    // ACTIVE TAB
+    const tabLinks = document.querySelectorAll('.tabs-nav a');
+    const sections = document.querySelectorAll('section[id]');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 150) cur = s.id;
+      });
+      tabLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+      });
+    });
+  </script>
+</body>
+</html>
